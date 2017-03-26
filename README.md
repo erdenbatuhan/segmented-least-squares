@@ -1,11 +1,11 @@
-# SegmentedLeastSquares
+# Segmented Least Squares
 
-Least squaresS
+Least squares:
 - Foundational problem in statistic and numerical analysis.
 - Given n points in the plane:  (x1, y1), (x2, y2) , . . . , (xn, yn).
 - Find a line y = ax + b that minimizes the sum of the squared error.
 
-Segmented least squares.
+Segmented least squares:
 - Points lie roughly on a sequence of several line segments.
 - Given n points in the plane (x1, y1), (x2, y2) , . . . , (xn, yn) with 
 - x1 < x2 < ... < xn, find a sequence of lines that minimizes:
