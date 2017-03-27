@@ -1,166 +1,180 @@
 import java.io.*;
 import java.util.*;
+import java.text.DecimalFormat;
 
 public class SegmentedLeastSquares {
-
-	private static final String FILE_NAME = "Points.txt";
-	private static final String DIGIT_REGEX = "(.*)(\\d+)(.*)";
-	private static final Scanner SCANNER = new Scanner(System.in);
-	private static final ArrayList<Coordinate> coordinates = new ArrayList<Coordinate>();
-	private static float c = (float) 0.0;
-
+	
+	private static final Point ORIGIN = new Point(0, 0);
+	private static final ArrayList<Point> POINTS = new ArrayList<Point>();
+	private static int N = 0; // number of elements (coordinates).
+	private static int n = 0; // index of the last element (coordinate).
+	private static float[] opt = null;
+	private static float[][] err = null;
+	private static float[][] a = null;
+	private static float[][] b = null;
+	
 	public static void main(String[] args) {
-		readCoordinatesFromFile();
-		getCFromUser();
+		POINTS.add(ORIGIN); // COORDINATES[0] = ORIGIN.
 		
-		System.out.println(c);
+		InputMaster.readCoordinatesFromFile();
+		InputMaster.readCFromUser();
 		
-		for (Coordinate crd : coordinates)
-			System.out.println(crd);
-		
-		printSolution();
-	}
-
-	private static void readCoordinatesFromFile() {
-		final File file = new File(FILE_NAME);
-		BufferedReader reader = null;
-        
-		try {	
-			reader = new BufferedReader(new FileReader(file));
-			String line = null;
-            
-			while ((line = reader.readLine()) != null)
-				addCoordinates(line);
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.print("File could not be read..");
-			System.exit(0);
-		}
-		finally {
-			try {
-				reader.close();
-			} catch (Exception e) {
-				System.out.print("Stream could not be closed..");
-				System.exit(0);
-			}
-		}
+		initializeArrays();
+		printDynamicProgrammingSolution();
 	}
 	
-	private static void addCoordinates(String line) {
-		if (!line.matches(DIGIT_REGEX))
-			return;
+	private static void initializeArrays() {
+		N = POINTS.size();
+		n = N - 1;
 		
-		StringTokenizer token = new StringTokenizer(line, " ");
-		int tokenCount = token.countTokens();
+		opt = new float[N];
+		err = new float[N][N];	
+		a = new float[N][N];
+		b = new float[N][N];
 		
-		if (tokenCount != 2) {
-			System.out.println("Wrong input format!");
-			System.exit(0);
-		}
-		
-		float x = Float.parseFloat(token.nextToken());
-		float y = Float.parseFloat(token.nextToken());
-		
-		coordinates.add(new Coordinate(x, y));
+		opt[0] = 0;
 	}
 	
-	private static void getCFromUser() {
-		System.out.print("Please enter C: ");
-		String userInput = SCANNER.nextLine();
-		
-		if (!userInput.matches(DIGIT_REGEX)) {
-			System.out.println("C must be a number, please check your input!");
-			getCFromUser();
-		} else {
-			c = Float.parseFloat(userInput);
-		}
-	}
 	
-	private static void printSolution() {
-		int n = coordinates.size();
-		float[] Opt = new float[n];
-		float[][] errors = new float[n][n];
-		
-		for (int j = 0; j < n; j++) {
-			for (int i = 0; i < j; i++) {
-				float sum_x  = 0;
-				float sum_y  = 0;
-				float sum_x2 = 0;
-				float sum_xy = 0;
-				
-				for (int k = i; k < j; k++) {
-					sum_x += coordinates.get(k).getX();
-					sum_x2 += (float) Math.pow(coordinates.get(k).getX(), 2);
-					sum_y += coordinates.get(k).getY();
-					sum_xy += coordinates.get(k).getX() * coordinates.get(k).getY();
-				}
-				
-				float a = ((n * sum_xy) - (sum_x * sum_y)) / 
-						  ((n * sum_x2) - (float) Math.pow(sum_x, 2));
-				float b = (sum_y - (a * sum_x)) / n;
-				
-				// errors[i][j] = y - a * x - b
-				errors[i][j] = (float) Math.pow(coordinates.get(i).getY() - (a * coordinates.get(i).getX()) - b, 2);
+	private static void printDynamicProgrammingSolution() {
+		for (int j = 1; j <= n; j++) {
+			for (int i = 1; i != j && i <= j; i++) {
+				computeTheLeastSquareErrorFor(i, j);
 			}
 		}
 		
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < n; j++) {
-				System.out.print(errors[i][j] + "	");
+		// TEST
+		for (float[] sub_err : err) {
+			for (float e : sub_err) {
+				System.out.print(new DecimalFormat("#.##").format(e) + "	");
 			}
-		
+			
 			System.out.println();
 		}
 		
-		Opt[0] = 0;
+		int[] segments = new int[N];
 		
-		for (int j = 1; j < n; j++) {
+		for (int j = 1; j <= n; j++) {
 			float min = Float.MAX_VALUE;
+			int minIndex = 0;
 			
-			for (int i = 1; i < j; i++) {
-				float current = errors[i][j] + c + Opt[j - 1];
+			for (int i = 1; i <= j; i++) {
+				float current = err[i][j] + InputMaster.c + opt[i - 1];
 				
-				if (current < min)
+				if (current < min) {
 					min = current;
+					minIndex = i;
+				}
 			}
 			
-			Opt[j] = min;
+			opt[j] = min;
+			segments[j] = minIndex;
 		}
 		
-		System.out.println("-----");
+		// TEST
+		for (int i = 0; i <= n; i++)
+			System.out.println("OPT[" + i + "] = " + opt[i]);
 		
-		for (float i : Opt)
-			System.out.println(i);
-	}
-}
-
-class Coordinate {
-	
-	private float x, y;
-	
-	public Coordinate(float x, float y) {
-		this.x = x;
-		this.y = y;
+		for (int i = 0; i <= n; i++)
+			System.out.println("segments[" + i + "] = " + segments[i]);
 	}
 	
-	@Override
-	public String toString() {
-		return "(" + x + ", " + y + ")";
+	private static void computeTheLeastSquareErrorFor(int i, int j) {
+		int diff = j - i + 1;
+		
+		float sum_x  = 0;
+		float sum_y  = 0;
+		float sum_x2 = 0;
+		float sum_xy = 0;
+		
+		for (int k = i; k <= j; k++) {
+			sum_x  += POINTS.get(k).x;
+			sum_y  += POINTS.get(k).y;
+			sum_x2 += POINTS.get(k).x * POINTS.get(k).x;
+			sum_xy += POINTS.get(k).x * POINTS.get(k).y;
+		}
+		
+		a[i][j] = (diff * sum_xy - sum_x * sum_y) / (diff * sum_x2 - sum_x * sum_x);
+		b[i][j] = (sum_y - a[i][j] * sum_x) / diff;
+		
+		for (int k = i; k <= j; k++)
+			err[i][j] += Math.pow(POINTS.get(k).y - a[i][j] * POINTS.get(k).x - b[i][j], 2);
 	}
 
-	public float getX() {
-		return x;
+	private static class Point {
+		
+		private float x, y;
+		
+		public Point(float x, float y) {
+			this.x = x;
+			this.y = y;
+		}
+		
+		@Override
+		public String toString() {
+			return "(" + x + ", " + y + ")";
+		}
 	}
+	
+	private static class InputMaster {
 
-	public void setX(int x) {
-		this.x = x;
-	}
-
-	public float getY() {
-		return y;
-	}
-
-	public void setY(int y) {
-		this.y = y;
+		private static final String FILE_NAME = "Points.txt";
+		private static final String DIGIT_REGEX = "(.*)(\\d+)(.*)";
+		private static final Scanner SCANNER = new Scanner(System.in);
+		private static float c = (float) 0.0;
+		
+		private static void readCoordinatesFromFile() {
+			final File file = new File(FILE_NAME);
+			BufferedReader reader = null;
+	        
+			try {
+				reader = new BufferedReader(new FileReader(file));
+				String line = null;
+	            
+				while ((line = reader.readLine()) != null)
+					addCoordinates(line);
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.out.print("File could not be read..");
+				System.exit(0);
+			} finally {
+				try {
+					reader.close();
+				} catch (Exception e) {
+					System.out.print("Stream could not be closed..");
+					System.exit(0);
+				}
+			}
+		}
+			
+		private static void addCoordinates(String line) {
+			if (!line.matches(DIGIT_REGEX))
+				return;
+			
+			StringTokenizer token = new StringTokenizer(line, " ");
+			int tokenCount = token.countTokens();
+			
+			if (tokenCount != 2) {
+				System.out.println("Wrong input format!");
+				System.exit(0);
+			}
+			
+			float x = Float.parseFloat(token.nextToken());
+			float y = Float.parseFloat(token.nextToken());
+			
+			POINTS.add(new Point(x, y));
+		}
+	
+		private static void readCFromUser() {
+			System.out.print("Please enter C: ");
+			String userInput = SCANNER.nextLine();
+			
+			if (!userInput.matches(DIGIT_REGEX)) {
+				System.out.println("C must be a number, please check your input!");
+				readCFromUser();
+			} else {
+				c = Float.parseFloat(userInput);
+			}
+		}
 	}
 }
