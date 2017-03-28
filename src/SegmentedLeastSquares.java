@@ -5,29 +5,31 @@ import java.util.*;
 
 public class SegmentedLeastSquares {
 
-	private static final Point ORIGIN = new Point(0, 0);
 	private static final ArrayList<Point> POINTS = new ArrayList<Point>();
-	private static int N = 0; // number of elements (coordinates).
-	private static int n = 0; // index of the last element (coordinate).
-	private static float C = 0; // the coefficient that determines the tradeoff.
-	private static float[][] a = null; // the array for slopes.
-	private static float[][] b = null; // the array for intercepts.
-	private static float[][] err = null; // the array for errors.
-	private static float[] opt = null; // the array for minimum costs.
-	private static int[] minIndexes = null; // the array for minimum indexes of minimum costs.
-	private static boolean[][] segments = null; // the array for the segments.
+	private int N = 0; // number of elements (coordinates).
+	private int n = 0; // index of the last element (coordinate).
+	private float C = 0; // the coefficient that determines the tradeoff.
+	private float[][] a = null; // the array for slopes.
+	private float[][] b = null; // the array for intercepts.
+	private float[][] errors = null; // the array for errors.
+	private float[] minCosts = null; // the array for minimum costs.
+	private int[] minIndexes = null; // the array for minimum indexes of minimum costs.
+	private boolean[][] segments = null; // the array for the segments.
 
 	public static void main(String[] args) {
-		POINTS.add(ORIGIN); // COORDINATES[0] = ORIGIN.
+		SegmentedLeastSquares segmentedLeastSquares = new SegmentedLeastSquares();
+		InputMaster inputMaster = segmentedLeastSquares.new InputMaster();
+		
+		POINTS.add(segmentedLeastSquares.new Point(0, 0)); // POINTS[0] = ORIGIN.
 
-		InputMaster.readCoordinatesFromFile();
-		InputMaster.readCFromUser();
+		inputMaster.readCoordinatesFromFile();
+		inputMaster.readCFromUser();
 
-		computeDynamicProgrammingSolution();
-		printDynamicProgrammingSolution();
+		segmentedLeastSquares.computeDynamicProgrammingSolution();
+		segmentedLeastSquares.printDynamicProgrammingSolution();
 	}
 
-	private static void computeDynamicProgrammingSolution() {
+	private void computeDynamicProgrammingSolution() {
 		initializeArrays();
 
 		for (int j = 1; j <= n; j++) {
@@ -40,21 +42,21 @@ public class SegmentedLeastSquares {
 		computeSegments();
 	}
 
-	private static void initializeArrays() {
+	private void initializeArrays() {
 		N = POINTS.size();
 		n = N - 1;
 
 		a = new float[N][N];
 		b = new float[N][N];
-		err = new float[N][N];
-		opt = new float[N];
+		errors = new float[N][N];
+		minCosts = new float[N];
 		minIndexes = new int[N];
 		segments = new boolean[N][N];
 
-		opt[0] = 0;
+		minCosts[0] = 0;
 	}
 
-	private static void computeTheLeastSquareErrorFor(int i, int j) {
+	private void computeTheLeastSquareErrorFor(int i, int j) {
 		int diff = j - i + 1;
 
 		float sum_x = 0;
@@ -73,16 +75,16 @@ public class SegmentedLeastSquares {
 		b[i][j] = (sum_y - a[i][j] * sum_x) / diff;
 
 		for (int k = i; k <= j; k++)
-			err[i][j] += Math.pow(POINTS.get(k).y - a[i][j] * POINTS.get(k).x - b[i][j], 2);
+			errors[i][j] += Math.pow(POINTS.get(k).y - a[i][j] * POINTS.get(k).x - b[i][j], 2);
 	}
 
-	private static void computeOptimalSolution() {
+	private void computeOptimalSolution() {
 		for (int j = 1; j <= n; j++) {
 			float min = Float.MAX_VALUE;
 			int minIndex = 0;
 
 			for (int i = 1; i <= j; i++) {
-				float current = err[i][j] + C + opt[i - 1];
+				float current = errors[i][j] + C + minCosts[i - 1];
 
 				if (current < min) {
 					min = current;
@@ -90,12 +92,12 @@ public class SegmentedLeastSquares {
 				}
 			}
 
-			opt[j] = min;
+			minCosts[j] = min;
 			minIndexes[j] = minIndex;
 		}
 	}
 
-	private static void computeSegments() {
+	private void computeSegments() {
 		for (int next = n; next >= 1; next--) {
 			int current = minIndexes[next];
 
@@ -108,10 +110,10 @@ public class SegmentedLeastSquares {
 		}
 	}
 
-	private static void printDynamicProgrammingSolution() {
+	private void printDynamicProgrammingSolution() {
 		System.out.println("----------- Dynamic Programming Solution of Segmented Least Squares -----------");
 		System.out.println("c = " + C);
-		System.out.println("Minimum Cost = " + opt[n]);
+		System.out.println("Minimum Cost = " + minCosts[n]);
 		System.out.println("------------------------");
 
 		for (int current = 1, i = 1; current <= n; current++) {
@@ -130,7 +132,7 @@ public class SegmentedLeastSquares {
 		}
 	}
 
-	private static class Point {
+	private class Point {
 
 		private float x, y;
 
@@ -145,13 +147,13 @@ public class SegmentedLeastSquares {
 		}
 	}
 
-	private static class InputMaster {
+	private class InputMaster {
 
 		private static final String FILE_NAME = "Points.txt";
 		private static final String DIGIT_REGEX = "(.*)(\\d+)(.*)";
-		private static final Scanner SCANNER = new Scanner(System.in);
+		private Scanner scanner;
 
-		private static void readCoordinatesFromFile() {
+		private void readCoordinatesFromFile() {
 			final File file = new File(FILE_NAME);
 			BufferedReader reader = null;
 
@@ -160,7 +162,7 @@ public class SegmentedLeastSquares {
 				String line = null;
 
 				while ((line = reader.readLine()) != null)
-					addCoordinates(line);
+					addPoint(line);
 			} catch (Exception e) {
 				terminateApplication("File could not be read");
 			} finally {
@@ -172,7 +174,7 @@ public class SegmentedLeastSquares {
 			}
 		}
 
-		private static void addCoordinates(String line) {
+		private void addPoint(String line) {
 			if (!line.matches(DIGIT_REGEX))
 				return;
 
@@ -188,18 +190,26 @@ public class SegmentedLeastSquares {
 			POINTS.add(new Point(x, y));
 		}
 
-		private static void readCFromUser() {
+		private void readCFromUser() {
+			scanner = new Scanner(System.in);
+			
 			try {
 				System.out.print("> Please enter c: ");
-				C = SCANNER.nextFloat();
+				C = scanner.nextFloat();
 			} catch (InputMismatchException e) {
 				terminateApplication("C must be a number");
+			} finally {
+				try {
+					scanner.close();
+				} catch (Exception e) {
+					terminateApplication("Scanner could not be closed");
+				}
 			}
-
+			
 			System.out.println();
 		}
 
-		private static void terminateApplication(String errorInfo) {
+		private void terminateApplication(String errorInfo) {
 			System.out.println("Error: " + errorInfo + "!");
 			System.out.println("# Application is being terminated..");
 
