@@ -1,3 +1,4 @@
+
 /* Batuhan Erden S004345 Department of Computer Science */
 
 import java.io.*;
@@ -123,14 +124,13 @@ public class SegmentedLeastSquares {
 			int next = segments[current];
 
 			if (next != 0) {
-				String bString = (b[current][next] < 0) ? 
-									(" - " + (b[current][next] * -1)) : 
-										(" + " + (b[current][next]));
+				String bString = (b[current][next] < 0) ? (" - " + (b[current][next] * -1))
+						: (" + " + (b[current][next]));
 				String yString = a[current][next] + "x" + bString;
 
-				System.out.println((++L) + ") Starting index = " + current + "     End index = " + next + 
-										   "     a = " + a[current][next] + "     b = " + b[current][next] + 
-										   "     SSE = " + errors[current][next] + "\n   y = " + yString);
+				System.out.println((++L) + ") Starting index = " + current + "     End index = " + next + "     a = "
+						+ a[current][next] + "     b = " + b[current][next] + "     SSE = " + errors[current][next]
+						+ "\n   y = " + yString);
 			}
 		}
 	}
@@ -141,7 +141,7 @@ public class SegmentedLeastSquares {
 
 		frame.setSize(500, 500);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
+
 		frame.add(panel);
 		frame.setVisible(true);
 	}
@@ -244,7 +244,7 @@ public class SegmentedLeastSquares {
 		public void paint(Graphics g) {
 			Graphics2D g2D = (Graphics2D) g;
 			drawCoordinateSystem(g);
-			
+
 			g.drawString("C: " + C, this.getWidth() / 2, 50);
 			g.translate(50, this.getHeight() * 3 / 4);
 
@@ -254,7 +254,7 @@ public class SegmentedLeastSquares {
 
 		private void drawCoordinateSystem(Graphics g) {
 			g.drawRect(1, 1, this.getWidth() - 2, this.getHeight() - 2);
-			
+
 			g.drawString("x", this.getWidth() - 30, this.getHeight() - 30);
 			g.drawLine(10, this.getHeight() - 20, this.getWidth() - 20, this.getHeight() - 20);
 
@@ -264,9 +264,8 @@ public class SegmentedLeastSquares {
 
 		private void drawOvals(Graphics2D g2D) {
 			for (int i = 1; i <= n; i++) {
-				Ellipse2D.Double oval = new Ellipse2D.Double(POINTS.get(i).x * SIZE - SIZE / 2, 
-															 -POINTS.get(i).y * SIZE - SIZE / 2, 
-															 SIZE, SIZE);
+				Ellipse2D.Double oval = new Ellipse2D.Double(POINTS.get(i).x * SIZE - SIZE / 2,
+						-POINTS.get(i).y * SIZE - SIZE / 2, SIZE, SIZE);
 				g2D.draw(oval);
 			}
 		}
