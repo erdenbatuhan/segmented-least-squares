@@ -243,28 +243,30 @@ public class SegmentedLeastSquares {
 
 		public void paint(Graphics g) {
 			Graphics2D g2D = (Graphics2D) g;
-			
 			drawCoordinateSystem(g);
-			g.drawString("C: " + C, this.getWidth() / 2, 50); // Drawing c..
-			g.translate(50, this.getHeight() * 3 / 4); // Translating the coordinate system..
+			
+			g.drawString("C: " + C, this.getWidth() / 2, 50);
+			g.translate(50, this.getHeight() * 3 / 4);
 
 			drawOvals(g2D);
 			drawLines(g, g2D);
 		}
 
 		private void drawCoordinateSystem(Graphics g) {
-			g.drawRect(1, 1, this.getWidth() - 2, this.getHeight() - 2); // Frame
-			// Drawing x..
-			g.drawLine(10, this.getHeight() - 20, this.getWidth() - 20, this.getHeight() - 20);
+			g.drawRect(1, 1, this.getWidth() - 2, this.getHeight() - 2);
+			
 			g.drawString("x", this.getWidth() - 30, this.getHeight() - 30);
-			// Drawing y..
-			g.drawLine(10, 10, 10, this.getHeight() - 20);
+			g.drawLine(10, this.getHeight() - 20, this.getWidth() - 20, this.getHeight() - 20);
+
 			g.drawString("y", 20, 20);
+			g.drawLine(10, 10, 10, this.getHeight() - 20);
 		}
 
 		private void drawOvals(Graphics2D g2D) {
 			for (int i = 1; i <= n; i++) {
-				Ellipse2D.Double oval = new Ellipse2D.Double(POINTS.get(i).x * SIZE - SIZE / 2, -POINTS.get(i).y * SIZE - SIZE / 2,  SIZE, SIZE);
+				Ellipse2D.Double oval = new Ellipse2D.Double(POINTS.get(i).x * SIZE - SIZE / 2, 
+															 -POINTS.get(i).y * SIZE - SIZE / 2, 
+															 SIZE, SIZE);
 				g2D.draw(oval);
 			}
 		}
