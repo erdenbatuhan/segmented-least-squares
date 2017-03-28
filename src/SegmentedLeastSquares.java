@@ -267,7 +267,7 @@ public class SegmentedLeastSquares {
 						-POINTS.get(i).y * size - size / 2, size, size);
 				g2D.draw(oval);
 				
-				if (size > 0.01 & (POINTS.get(i).x * size + size / 2 > this.getWidth() - 100
+				if (size > 0.01 && (POINTS.get(i).x * size + size / 2 > this.getWidth() - 100
 						|| POINTS.get(i).y * size - size / 2 > this.getHeight() * 3 / 4 - 100)) {
 					if (size > 0.1)
 						size -= 0.1;
