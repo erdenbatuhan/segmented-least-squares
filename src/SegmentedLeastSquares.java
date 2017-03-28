@@ -1,4 +1,3 @@
-
 /* Batuhan Erden S004345 Department of Computer Science */
 
 import java.io.*;
