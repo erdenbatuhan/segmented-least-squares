@@ -55,8 +55,6 @@ public class SegmentedLeastSquares {
 		minCosts = new double[N];
 		minIndexes = new int[N];
 		segments = new int[N];
-
-		minCosts[0] = 0;
 	}
 
 	private void computeTheLeastSquareErrorFor(int i, int j) {
@@ -67,7 +65,7 @@ public class SegmentedLeastSquares {
 		double sum_x2 = 0;
 		double sum_xy = 0;
 
-		for (int k = i; k <= j; k++) { // Calculating sums..
+		for (int k = i; k <= j; k++) {
 			sum_x += POINTS.get(k).x;
 			sum_y += POINTS.get(k).y;
 			sum_x2 += POINTS.get(k).x * POINTS.get(k).x;
@@ -77,11 +75,13 @@ public class SegmentedLeastSquares {
 		a[i][j] = (diff * sum_xy - sum_x * sum_y) / (diff * sum_x2 - sum_x * sum_x);
 		b[i][j] = (sum_y - a[i][j] * sum_x) / diff;
 
-		for (int k = i; k <= j; k++) // Calculating SSE..
+		for (int k = i; k <= j; k++) // SSE
 			errors[i][j] += Math.pow(POINTS.get(k).y - a[i][j] * POINTS.get(k).x - b[i][j], 2);
 	}
 
 	private void computeOptimalSolution() {
+		minCosts[0] = 0;
+		
 		for (int j = 1; j <= n; j++) {
 			double min = Double.POSITIVE_INFINITY;
 			int minIndex = 0;
