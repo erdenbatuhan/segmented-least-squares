@@ -233,7 +233,7 @@ public class SegmentedLeastSquares {
 	@SuppressWarnings("serial")
 	private class SolutionPanel extends JPanel {
 
-		private static final int SIZE = 3;
+		private double size = 20;
 		private Color[] colors = { Color.BLUE, Color.RED, Color.GREEN, Color.MAGENTA, Color.CYAN };
 
 		public SolutionPanel(JFrame frame) {
@@ -263,9 +263,20 @@ public class SegmentedLeastSquares {
 
 		private void drawOvals(Graphics2D g2D) {
 			for (int i = 1; i <= n; i++) {
-				Ellipse2D.Double oval = new Ellipse2D.Double(POINTS.get(i).x * SIZE - SIZE / 2,
-						-POINTS.get(i).y * SIZE - SIZE / 2, SIZE, SIZE);
+				Ellipse2D.Double oval = new Ellipse2D.Double(POINTS.get(i).x * size - size / 2,
+						-POINTS.get(i).y * size - size / 2, size, size);
 				g2D.draw(oval);
+				
+				if (size > 0.01 & (POINTS.get(i).x * size + size / 2 > this.getWidth() - 100
+						|| POINTS.get(i).y * size - size / 2 > this.getHeight() * 3 / 4 - 100)) {
+					if (size > 0.1)
+						size -= 0.1;
+					else
+						size -= 0.01;
+
+					repaint();
+					break;
+				}
 			}
 		}
 
@@ -281,7 +292,7 @@ public class SegmentedLeastSquares {
 					double y1 = -(a[current][next] * x1 + b[current][next]);
 					double y2 = -(a[current][next] * x2 + b[current][next]);
 
-					Line2D.Double line = new Line2D.Double(x1 * SIZE, y1 * SIZE, x2 * SIZE, y2 * SIZE);
+					Line2D.Double line = new Line2D.Double(x1 * size, y1 * size, x2 * size, y2 * size);
 					g2D.draw(line);
 				}
 			}
