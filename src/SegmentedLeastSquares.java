@@ -237,6 +237,7 @@ public class SegmentedLeastSquares {
 	@SuppressWarnings("serial")
 	private class SolutionPanel extends JPanel {
 
+		private static final int V = 10;
 		private double size = 20;
 		private Color[] colors = { Color.BLUE, Color.RED, Color.GREEN, Color.MAGENTA, Color.CYAN };
 		private Dimension dimension = null;
@@ -250,7 +251,7 @@ public class SegmentedLeastSquares {
 			Graphics2D g2D = (Graphics2D) g;
 			drawCoordinateSystem(g);
 
-			g.drawString("C: " + C, 20, 20);
+			g.drawString("C: " + C, V * 2, V * 2);
 			g.translate(this.getWidth() / 2, this.getHeight() / 2);
 
 			drawOvals(g2D);
@@ -258,10 +259,10 @@ public class SegmentedLeastSquares {
 		}
 
 		private void drawCoordinateSystem(Graphics g) {
-			g.drawString("x", this.getWidth() - 20, this.getHeight() / 2 - 10);
+			g.drawString("x", this.getWidth() - V * 2, this.getHeight() / 2 - V);
 			g.drawLine(0, this.getHeight() / 2, this.getWidth(), this.getHeight() / 2);
 
-			g.drawString("y", this.getWidth() / 2 + 10, 20);
+			g.drawString("y", this.getWidth() / 2 + V, V * 2);
 			g.drawLine(this.getWidth() / 2, 0, this.getWidth() / 2, this.getHeight());
 		}
 
