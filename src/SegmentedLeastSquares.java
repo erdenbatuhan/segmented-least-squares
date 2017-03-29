@@ -1,4 +1,8 @@
-/* Batuhan Erden S004345 Department of Computer Science */
+/*
+ * Project   : SegmentedLeastSquares
+ * Class     : SegmentedLeastSquares.java
+ * Developer : Batuhan Erden
+ */
 
 import java.io.*;
 import java.util.*;
@@ -235,42 +239,46 @@ public class SegmentedLeastSquares {
 
 		private double size = 20;
 		private Color[] colors = { Color.BLUE, Color.RED, Color.GREEN, Color.MAGENTA, Color.CYAN };
+		private Dimension dimension = null;
 
 		public SolutionPanel(JFrame frame) {
-			this.setSize(frame.getWidth(), frame.getHeight());
+			dimension = new Dimension(frame.getWidth(), frame.getHeight());
+			this.setSize(dimension);
 		}
 
 		public void paint(Graphics g) {
 			Graphics2D g2D = (Graphics2D) g;
 			drawCoordinateSystem(g);
 
-			g.drawString("C: " + C, this.getWidth() / 2, 50);
-			g.translate(50, this.getHeight() * 3 / 4);
+			g.drawString("C: " + C, 20, 20);
+			g.translate(this.getWidth() / 2, this.getHeight() / 2);
 
 			drawOvals(g2D);
 			drawLines(g, g2D);
 		}
 
 		private void drawCoordinateSystem(Graphics g) {
-			g.drawRect(1, 1, this.getWidth() - 2, this.getHeight() - 2);
+			g.drawString("x", this.getWidth() - 20, this.getHeight() / 2 - 10);
+			g.drawLine(0, this.getHeight() / 2, this.getWidth(), this.getHeight() / 2);
 
-			g.drawString("x", this.getWidth() - 30, this.getHeight() - 30);
-			g.drawLine(10, this.getHeight() - 20, this.getWidth() - 20, this.getHeight() - 20);
-
-			g.drawString("y", 20, 20);
-			g.drawLine(10, 10, 10, this.getHeight() - 20);
+			g.drawString("y", this.getWidth() / 2 + 10, 20);
+			g.drawLine(this.getWidth() / 2, 0, this.getWidth() / 2, this.getHeight());
 		}
 
 		private void drawOvals(Graphics2D g2D) {
 			for (int i = 1; i <= n; i++) {
-				Ellipse2D.Double oval = new Ellipse2D.Double(POINTS.get(i).x * size - size / 2,
-						-POINTS.get(i).y * size - size / 2, size, size);
+				double x = POINTS.get(i).x * size - size / 2;
+				double y = -POINTS.get(i).y * size - size / 2;
+				
+				double maxX = this.getWidth() / 2 - (size * 2);
+				double maxY = this.getHeight() / 2 - (size * 2);
+				
+				Ellipse2D.Double oval = new Ellipse2D.Double(x, y, size, size);
 				g2D.draw(oval);
 				
-				if (size > 0.1 && (POINTS.get(i).x * size + size / 2 > this.getWidth() - 100
-						|| POINTS.get(i).y * size - size / 2 > this.getHeight() * 3 / 4 - 100)) {
+				if (size > 0.1 && (x > maxX || y > maxY || -x > maxX || -y > maxY)) {
 					size -= 0.1;
-
+					
 					repaint();
 					break;
 				}
