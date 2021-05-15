@@ -166,7 +166,7 @@ public class SegmentedLeastSquares {
 
 	private class InputMaster {
 
-		private static final String FILE_NAME = "Points.txt";
+		private static final String FILE_NAME = "../Points.txt";
 		private static final String DIGIT_REGEX = "(.*)(\\d+)(.*)";
 		private Scanner scanner;
 
