@@ -1,3 +1,6 @@
 /bin/
 /out/
-**.DS_Store
+
+*.class
+
+.DS_Store
